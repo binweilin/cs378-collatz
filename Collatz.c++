@@ -43,7 +43,7 @@ int collatz_eval (int i, int j) {
                 length++;
             }
             else{
-                n = 3*n + 1;
+                n = (3*n + 1)/2;
                 length++;
             }
         }
