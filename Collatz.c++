@@ -11,8 +11,11 @@
 #include <cassert>  // assert
 #include <iostream> // endl, istream, ostream
 #include <utility>  // make_pair, pair
-
+#include <map>
 #include "Collatz.h"
+
+std::map<int, int> cache;
+//int cache[1000000] = {0};
 
 // ------------
 // collatz_read
@@ -35,21 +38,38 @@ int collatz_eval (int i, int j) {
     // <your code>
     int max = 0;
     if(i < j /2)
-        i = j/2
+        i = j/2;
 
     for(int k = i; k <= j; k++){       
         int length = 1;
         int n = k;
-        while(n != 1){
-            if(n%2 == 0){
-                n /= 2;
-                length++;
+        if(cache.count(k) != 0)
+            length = cache[k];
+
+        if(cache[k] != 0)
+            length = cache[k];
+        else{
+            while(n != 1){
+                if(n%2 == 0){
+                    n /= 2;
+                    length++;
+                }
+                else{
+                    n = (3*n + 1)/2;
+                    length+=2;
+                }
+                if(cache.count(n) != 0){
+                    length += cache[n] - 1;
+                    n = 1;
+                }
+                // if(n < 1000000 && cache[n] != 0){
+                //     length += cache[n] - 1;
+                //     n = 1;
+                // }
             }
-            else{
-                n = (3*n + 1)/2;
-                length++;
-            }
+            cache[k] = length;
         }
+
         if(length > max)
             max = length;
     }
