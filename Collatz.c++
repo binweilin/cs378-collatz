@@ -34,6 +34,9 @@ std::pair<int, int> collatz_read (std::istream& r) {
 int collatz_eval (int i, int j) {
     // <your code>
     int max = 0;
+    if(i < j /2)
+        i = j/2
+
     for(int k = i; k <= j; k++){       
         int length = 1;
         int n = k;
