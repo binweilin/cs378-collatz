@@ -1,0 +1,1004 @@
+        -:    0:Source:/usr/include/c++/4.7/bits/stl_map.h
+        -:    0:Programs:2
+        -:    1:// Map implementation -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+        -:    4:// 2011, 2012 Free Software Foundation, Inc.
+        -:    5://
+        -:    6:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    7:// software; you can redistribute it and/or modify it under the
+        -:    8:// terms of the GNU General Public License as published by the
+        -:    9:// Free Software Foundation; either version 3, or (at your option)
+        -:   10:// any later version.
+        -:   11:
+        -:   12:// This library is distributed in the hope that it will be useful,
+        -:   13:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   14:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   15:// GNU General Public License for more details.
+        -:   16:
+        -:   17:// Under Section 7 of GPL version 3, you are granted additional
+        -:   18:// permissions described in the GCC Runtime Library Exception, version
+        -:   19:// 3.1, as published by the Free Software Foundation.
+        -:   20:
+        -:   21:// You should have received a copy of the GNU General Public License and
+        -:   22:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   23:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   24:// <http://www.gnu.org/licenses/>.
+        -:   25:
+        -:   26:/*
+        -:   27: *
+        -:   28: * Copyright (c) 1994
+        -:   29: * Hewlett-Packard Company
+        -:   30: *
+        -:   31: * Permission to use, copy, modify, distribute and sell this software
+        -:   32: * and its documentation for any purpose is hereby granted without fee,
+        -:   33: * provided that the above copyright notice appear in all copies and
+        -:   34: * that both that copyright notice and this permission notice appear
+        -:   35: * in supporting documentation.  Hewlett-Packard Company makes no
+        -:   36: * representations about the suitability of this software for any
+        -:   37: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   38: *
+        -:   39: *
+        -:   40: * Copyright (c) 1996,1997
+        -:   41: * Silicon Graphics Computer Systems, Inc.
+        -:   42: *
+        -:   43: * Permission to use, copy, modify, distribute and sell this software
+        -:   44: * and its documentation for any purpose is hereby granted without fee,
+        -:   45: * provided that the above copyright notice appear in all copies and
+        -:   46: * that both that copyright notice and this permission notice appear
+        -:   47: * in supporting documentation.  Silicon Graphics makes no
+        -:   48: * representations about the suitability of this software for any
+        -:   49: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   50: */
+        -:   51:
+        -:   52:/** @file bits/stl_map.h
+        -:   53: *  This is an internal header file, included by other library headers.
+        -:   54: *  Do not attempt to use it directly. @headername{map}
+        -:   55: */
+        -:   56:
+        -:   57:#ifndef _STL_MAP_H
+        -:   58:#define _STL_MAP_H 1
+        -:   59:
+        -:   60:#include <bits/functexcept.h>
+        -:   61:#include <bits/concept_check.h>
+        -:   62:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:   63:#include <initializer_list>
+        -:   64:#endif
+        -:   65:
+        -:   66:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   67:{
+        -:   68:_GLIBCXX_BEGIN_NAMESPACE_CONTAINER
+        -:   69:
+        -:   70:  /**
+        -:   71:   *  @brief A standard container made up of (key,value) pairs, which can be
+        -:   72:   *  retrieved based on a key, in logarithmic time.
+        -:   73:   *
+        -:   74:   *  @ingroup associative_containers
+        -:   75:   *
+        -:   76:   *  Meets the requirements of a <a href="tables.html#65">container</a>, a
+        -:   77:   *  <a href="tables.html#66">reversible container</a>, and an
+        -:   78:   *  <a href="tables.html#69">associative container</a> (using unique keys).
+        -:   79:   *  For a @c map<Key,T> the key_type is Key, the mapped_type is T, and the
+        -:   80:   *  value_type is std::pair<const Key,T>.
+        -:   81:   *
+        -:   82:   *  Maps support bidirectional iterators.
+        -:   83:   *
+        -:   84:   *  The private tree data is declared exactly the same way for map and
+        -:   85:   *  multimap; the distinction is made entirely in how the tree functions are
+        -:   86:   *  called (*_unique versus *_equal, same as the standard).
+        -:   87:  */
+        -:   88:  template <typename _Key, typename _Tp, typename _Compare = std::less<_Key>,
+        -:   89:            typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >
+function _ZNSt3mapIiiSt4lessIiESaISt4pairIKiiEEED2Ev called 0 returned 0% blocks executed 0%
+    #####:   90:    class map
+call    0 never executed
+        -:   91:    {
+        -:   92:    public:
+        -:   93:      typedef _Key                                          key_type;
+        -:   94:      typedef _Tp                                           mapped_type;
+        -:   95:      typedef std::pair<const _Key, _Tp>                    value_type;
+        -:   96:      typedef _Compare                                      key_compare;
+        -:   97:      typedef _Alloc                                        allocator_type;
+        -:   98:
+        -:   99:    private:
+        -:  100:      // concept requirements
+        -:  101:      typedef typename _Alloc::value_type                   _Alloc_value_type;
+        -:  102:      __glibcxx_class_requires(_Tp, _SGIAssignableConcept)
+        -:  103:      __glibcxx_class_requires4(_Compare, bool, _Key, _Key,
+        -:  104:				_BinaryFunctionConcept)
+        -:  105:      __glibcxx_class_requires2(value_type, _Alloc_value_type, _SameTypeConcept)
+        -:  106:
+        -:  107:    public:
+        -:  108:      class value_compare
+        -:  109:      : public std::binary_function<value_type, value_type, bool>
+        -:  110:      {
+        -:  111:	friend class map<_Key, _Tp, _Compare, _Alloc>;
+        -:  112:      protected:
+        -:  113:	_Compare comp;
+        -:  114:
+        -:  115:	value_compare(_Compare __c)
+        -:  116:	: comp(__c) { }
+        -:  117:
+        -:  118:      public:
+        -:  119:	bool operator()(const value_type& __x, const value_type& __y) const
+        -:  120:	{ return comp(__x.first, __y.first); }
+        -:  121:      };
+        -:  122:
+        -:  123:    private:
+        -:  124:      /// This turns a red-black tree into a [multi]map. 
+        -:  125:      typedef typename _Alloc::template rebind<value_type>::other 
+        -:  126:        _Pair_alloc_type;
+        -:  127:
+        -:  128:      typedef _Rb_tree<key_type, value_type, _Select1st<value_type>,
+        -:  129:		       key_compare, _Pair_alloc_type> _Rep_type;
+        -:  130:
+        -:  131:      /// The actual tree structure.
+        -:  132:      _Rep_type _M_t;
+        -:  133:
+        -:  134:    public:
+        -:  135:      // many of these are specified differently in ISO, but the following are
+        -:  136:      // "functionally equivalent"
+        -:  137:      typedef typename _Pair_alloc_type::pointer         pointer;
+        -:  138:      typedef typename _Pair_alloc_type::const_pointer   const_pointer;
+        -:  139:      typedef typename _Pair_alloc_type::reference       reference;
+        -:  140:      typedef typename _Pair_alloc_type::const_reference const_reference;
+        -:  141:      typedef typename _Rep_type::iterator               iterator;
+        -:  142:      typedef typename _Rep_type::const_iterator         const_iterator;
+        -:  143:      typedef typename _Rep_type::size_type              size_type;
+        -:  144:      typedef typename _Rep_type::difference_type        difference_type;
+        -:  145:      typedef typename _Rep_type::reverse_iterator       reverse_iterator;
+        -:  146:      typedef typename _Rep_type::const_reverse_iterator const_reverse_iterator;
+        -:  147:
+        -:  148:      // [23.3.1.1] construct/copy/destroy
+        -:  149:      // (get_allocator() is normally listed in this section, but seems to have
+        -:  150:      // been accidentally omitted in the printed standard)
+        -:  151:      /**
+        -:  152:       *  @brief  Default constructor creates no elements.
+        -:  153:       */
+function _ZNSt3mapIiiSt4lessIiESaISt4pairIKiiEEEC2Ev called 1 returned 100% blocks executed 100%
+        1:  154:      map()
+        1:  155:      : _M_t() { }
+call    0 returned 100%
+        -:  156:
+        -:  157:      /**
+        -:  158:       *  @brief  Creates a %map with no elements.
+        -:  159:       *  @param  __comp  A comparison object.
+        -:  160:       *  @param  __a  An allocator object.
+        -:  161:       */
+        -:  162:      explicit
+        -:  163:      map(const _Compare& __comp,
+        -:  164:	  const allocator_type& __a = allocator_type())
+        -:  165:      : _M_t(__comp, _Pair_alloc_type(__a)) { }
+        -:  166:
+        -:  167:      /**
+        -:  168:       *  @brief  %Map copy constructor.
+        -:  169:       *  @param  __x  A %map of identical element and allocator types.
+        -:  170:       *
+        -:  171:       *  The newly-created %map uses a copy of the allocation object
+        -:  172:       *  used by @a __x.
+        -:  173:       */
+        -:  174:      map(const map& __x)
+        -:  175:      : _M_t(__x._M_t) { }
+        -:  176:
+        -:  177:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  178:      /**
+        -:  179:       *  @brief  %Map move constructor.
+        -:  180:       *  @param  __x  A %map of identical element and allocator types.
+        -:  181:       *
+        -:  182:       *  The newly-created %map contains the exact contents of @a __x.
+        -:  183:       *  The contents of @a __x are a valid, but unspecified %map.
+        -:  184:       */
+        -:  185:      map(map&& __x)
+        -:  186:      noexcept(is_nothrow_copy_constructible<_Compare>::value)
+        -:  187:      : _M_t(std::move(__x._M_t)) { }
+        -:  188:
+        -:  189:      /**
+        -:  190:       *  @brief  Builds a %map from an initializer_list.
+        -:  191:       *  @param  __l  An initializer_list.
+        -:  192:       *  @param  __comp  A comparison object.
+        -:  193:       *  @param  __a  An allocator object.
+        -:  194:       *
+        -:  195:       *  Create a %map consisting of copies of the elements in the
+        -:  196:       *  initializer_list @a __l.
+        -:  197:       *  This is linear in N if the range is already sorted, and NlogN
+        -:  198:       *  otherwise (where N is @a __l.size()).
+        -:  199:       */
+        -:  200:      map(initializer_list<value_type> __l,
+        -:  201:	  const _Compare& __comp = _Compare(),
+        -:  202:	  const allocator_type& __a = allocator_type())
+        -:  203:      : _M_t(__comp, _Pair_alloc_type(__a))
+        -:  204:      { _M_t._M_insert_unique(__l.begin(), __l.end()); }
+        -:  205:#endif
+        -:  206:
+        -:  207:      /**
+        -:  208:       *  @brief  Builds a %map from a range.
+        -:  209:       *  @param  __first  An input iterator.
+        -:  210:       *  @param  __last  An input iterator.
+        -:  211:       *
+        -:  212:       *  Create a %map consisting of copies of the elements from
+        -:  213:       *  [__first,__last).  This is linear in N if the range is
+        -:  214:       *  already sorted, and NlogN otherwise (where N is
+        -:  215:       *  distance(__first,__last)).
+        -:  216:       */
+        -:  217:      template<typename _InputIterator>
+        -:  218:        map(_InputIterator __first, _InputIterator __last)
+        -:  219:	: _M_t()
+        -:  220:        { _M_t._M_insert_unique(__first, __last); }
+        -:  221:
+        -:  222:      /**
+        -:  223:       *  @brief  Builds a %map from a range.
+        -:  224:       *  @param  __first  An input iterator.
+        -:  225:       *  @param  __last  An input iterator.
+        -:  226:       *  @param  __comp  A comparison functor.
+        -:  227:       *  @param  __a  An allocator object.
+        -:  228:       *
+        -:  229:       *  Create a %map consisting of copies of the elements from
+        -:  230:       *  [__first,__last).  This is linear in N if the range is
+        -:  231:       *  already sorted, and NlogN otherwise (where N is
+        -:  232:       *  distance(__first,__last)).
+        -:  233:       */
+        -:  234:      template<typename _InputIterator>
+        -:  235:        map(_InputIterator __first, _InputIterator __last,
+        -:  236:	    const _Compare& __comp,
+        -:  237:	    const allocator_type& __a = allocator_type())
+        -:  238:	: _M_t(__comp, _Pair_alloc_type(__a))
+        -:  239:        { _M_t._M_insert_unique(__first, __last); }
+        -:  240:
+        -:  241:      // FIXME There is no dtor declared, but we should have something
+        -:  242:      // generated by Doxygen.  I don't know what tags to add to this
+        -:  243:      // paragraph to make that happen:
+        -:  244:      /**
+        -:  245:       *  The dtor only erases the elements, and note that if the elements
+        -:  246:       *  themselves are pointers, the pointed-to memory is not touched in any
+        -:  247:       *  way.  Managing the pointer is the user's responsibility.
+        -:  248:       */
+        -:  249:
+        -:  250:      /**
+        -:  251:       *  @brief  %Map assignment operator.
+        -:  252:       *  @param  __x  A %map of identical element and allocator types.
+        -:  253:       *
+        -:  254:       *  All the elements of @a __x are copied, but unlike the copy
+        -:  255:       *  constructor, the allocator object is not copied.
+        -:  256:       */
+        -:  257:      map&
+        -:  258:      operator=(const map& __x)
+        -:  259:      {
+        -:  260:	_M_t = __x._M_t;
+        -:  261:	return *this;
+        -:  262:      }
+        -:  263:
+        -:  264:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  265:      /**
+        -:  266:       *  @brief  %Map move assignment operator.
+        -:  267:       *  @param  __x  A %map of identical element and allocator types.
+        -:  268:       *
+        -:  269:       *  The contents of @a __x are moved into this map (without copying).
+        -:  270:       *  @a __x is a valid, but unspecified %map.
+        -:  271:       */
+        -:  272:      map&
+        -:  273:      operator=(map&& __x)
+        -:  274:      {
+        -:  275:	// NB: DR 1204.
+        -:  276:	// NB: DR 675.
+        -:  277:	this->clear();
+        -:  278:	this->swap(__x);
+        -:  279:	return *this;
+        -:  280:      }
+        -:  281:
+        -:  282:      /**
+        -:  283:       *  @brief  %Map list assignment operator.
+        -:  284:       *  @param  __l  An initializer_list.
+        -:  285:       *
+        -:  286:       *  This function fills a %map with copies of the elements in the
+        -:  287:       *  initializer list @a __l.
+        -:  288:       *
+        -:  289:       *  Note that the assignment completely changes the %map and
+        -:  290:       *  that the resulting %map's size is the same as the number
+        -:  291:       *  of elements assigned.  Old data may be lost.
+        -:  292:       */
+        -:  293:      map&
+        -:  294:      operator=(initializer_list<value_type> __l)
+        -:  295:      {
+        -:  296:	this->clear();
+        -:  297:	this->insert(__l.begin(), __l.end());
+        -:  298:	return *this;
+        -:  299:      }
+        -:  300:#endif
+        -:  301:
+        -:  302:      /// Get a copy of the memory allocation object.
+        -:  303:      allocator_type
+        -:  304:      get_allocator() const _GLIBCXX_NOEXCEPT
+        -:  305:      { return allocator_type(_M_t.get_allocator()); }
+        -:  306:
+        -:  307:      // iterators
+        -:  308:      /**
+        -:  309:       *  Returns a read/write iterator that points to the first pair in the
+        -:  310:       *  %map.
+        -:  311:       *  Iteration is done in ascending order according to the keys.
+        -:  312:       */
+        -:  313:      iterator
+        -:  314:      begin() _GLIBCXX_NOEXCEPT
+        -:  315:      { return _M_t.begin(); }
+        -:  316:
+        -:  317:      /**
+        -:  318:       *  Returns a read-only (constant) iterator that points to the first pair
+        -:  319:       *  in the %map.  Iteration is done in ascending order according to the
+        -:  320:       *  keys.
+        -:  321:       */
+        -:  322:      const_iterator
+        -:  323:      begin() const _GLIBCXX_NOEXCEPT
+        -:  324:      { return _M_t.begin(); }
+        -:  325:
+        -:  326:      /**
+        -:  327:       *  Returns a read/write iterator that points one past the last
+        -:  328:       *  pair in the %map.  Iteration is done in ascending order
+        -:  329:       *  according to the keys.
+        -:  330:       */
+        -:  331:      iterator
+function _ZNSt3mapIiiSt4lessIiESaISt4pairIKiiEEE3endEv called 1739 returned 100% blocks executed 100%
+     1739:  332:      end() _GLIBCXX_NOEXCEPT
+     1739:  333:      { return _M_t.end(); }
+call    0 returned 100%
+        -:  334:
+        -:  335:      /**
+        -:  336:       *  Returns a read-only (constant) iterator that points one past the last
+        -:  337:       *  pair in the %map.  Iteration is done in ascending order according to
+        -:  338:       *  the keys.
+        -:  339:       */
+        -:  340:      const_iterator
+        -:  341:      end() const _GLIBCXX_NOEXCEPT
+        -:  342:      { return _M_t.end(); }
+        -:  343:
+        -:  344:      /**
+        -:  345:       *  Returns a read/write reverse iterator that points to the last pair in
+        -:  346:       *  the %map.  Iteration is done in descending order according to the
+        -:  347:       *  keys.
+        -:  348:       */
+        -:  349:      reverse_iterator
+        -:  350:      rbegin() _GLIBCXX_NOEXCEPT
+        -:  351:      { return _M_t.rbegin(); }
+        -:  352:
+        -:  353:      /**
+        -:  354:       *  Returns a read-only (constant) reverse iterator that points to the
+        -:  355:       *  last pair in the %map.  Iteration is done in descending order
+        -:  356:       *  according to the keys.
+        -:  357:       */
+        -:  358:      const_reverse_iterator
+        -:  359:      rbegin() const _GLIBCXX_NOEXCEPT
+        -:  360:      { return _M_t.rbegin(); }
+        -:  361:
+        -:  362:      /**
+        -:  363:       *  Returns a read/write reverse iterator that points to one before the
+        -:  364:       *  first pair in the %map.  Iteration is done in descending order
+        -:  365:       *  according to the keys.
+        -:  366:       */
+        -:  367:      reverse_iterator
+        -:  368:      rend() _GLIBCXX_NOEXCEPT
+        -:  369:      { return _M_t.rend(); }
+        -:  370:
+        -:  371:      /**
+        -:  372:       *  Returns a read-only (constant) reverse iterator that points to one
+        -:  373:       *  before the first pair in the %map.  Iteration is done in descending
+        -:  374:       *  order according to the keys.
+        -:  375:       */
+        -:  376:      const_reverse_iterator
+        -:  377:      rend() const _GLIBCXX_NOEXCEPT
+        -:  378:      { return _M_t.rend(); }
+        -:  379:
+        -:  380:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  381:      /**
+        -:  382:       *  Returns a read-only (constant) iterator that points to the first pair
+        -:  383:       *  in the %map.  Iteration is done in ascending order according to the
+        -:  384:       *  keys.
+        -:  385:       */
+        -:  386:      const_iterator
+        -:  387:      cbegin() const noexcept
+        -:  388:      { return _M_t.begin(); }
+        -:  389:
+        -:  390:      /**
+        -:  391:       *  Returns a read-only (constant) iterator that points one past the last
+        -:  392:       *  pair in the %map.  Iteration is done in ascending order according to
+        -:  393:       *  the keys.
+        -:  394:       */
+        -:  395:      const_iterator
+        -:  396:      cend() const noexcept
+        -:  397:      { return _M_t.end(); }
+        -:  398:
+        -:  399:      /**
+        -:  400:       *  Returns a read-only (constant) reverse iterator that points to the
+        -:  401:       *  last pair in the %map.  Iteration is done in descending order
+        -:  402:       *  according to the keys.
+        -:  403:       */
+        -:  404:      const_reverse_iterator
+        -:  405:      crbegin() const noexcept
+        -:  406:      { return _M_t.rbegin(); }
+        -:  407:
+        -:  408:      /**
+        -:  409:       *  Returns a read-only (constant) reverse iterator that points to one
+        -:  410:       *  before the first pair in the %map.  Iteration is done in descending
+        -:  411:       *  order according to the keys.
+        -:  412:       */
+        -:  413:      const_reverse_iterator
+        -:  414:      crend() const noexcept
+        -:  415:      { return _M_t.rend(); }
+        -:  416:#endif
+        -:  417:
+        -:  418:      // capacity
+        -:  419:      /** Returns true if the %map is empty.  (Thus begin() would equal
+        -:  420:       *  end().)
+        -:  421:      */
+        -:  422:      bool
+        -:  423:      empty() const _GLIBCXX_NOEXCEPT
+        -:  424:      { return _M_t.empty(); }
+        -:  425:
+        -:  426:      /** Returns the size of the %map.  */
+        -:  427:      size_type
+        -:  428:      size() const _GLIBCXX_NOEXCEPT
+        -:  429:      { return _M_t.size(); }
+        -:  430:
+        -:  431:      /** Returns the maximum size of the %map.  */
+        -:  432:      size_type
+        -:  433:      max_size() const _GLIBCXX_NOEXCEPT
+        -:  434:      { return _M_t.max_size(); }
+        -:  435:
+        -:  436:      // [23.3.1.2] element access
+        -:  437:      /**
+        -:  438:       *  @brief  Subscript ( @c [] ) access to %map data.
+        -:  439:       *  @param  __k  The key for which data should be retrieved.
+        -:  440:       *  @return  A reference to the data of the (key,data) %pair.
+        -:  441:       *
+        -:  442:       *  Allows for easy lookup with the subscript ( @c [] )
+        -:  443:       *  operator.  Returns data associated with the key specified in
+        -:  444:       *  subscript.  If the key does not exist, a pair with that key
+        -:  445:       *  is created using default values, which is then returned.
+        -:  446:       *
+        -:  447:       *  Lookup requires logarithmic time.
+        -:  448:       */
+        -:  449:      mapped_type&
+function _ZNSt3mapIiiSt4lessIiESaISt4pairIKiiEEEixERS3_ called 1739 returned 100% blocks executed 69%
+     1739:  450:      operator[](const key_type& __k)
+        -:  451:      {
+        -:  452:	// concept requirements
+        -:  453:	__glibcxx_function_requires(_DefaultConstructibleConcept<mapped_type>)
+        -:  454:
+     1739:  455:	iterator __i = lower_bound(__k);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+        -:  456:	// __i->first is greater than or equivalent to __k.
+     1739:  457:	if (__i == end() || key_comp()(__k, (*__i).first))
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 87% (fallthrough)
+branch  3 taken 13%
+call    4 returned 100%
+branch  5 taken 100% (fallthrough)
+branch  6 taken 0% (throw)
+call    7 returned 100%
+call    8 returned 100%
+branch  9 taken 7% (fallthrough)
+branch 10 taken 93%
+branch 11 taken 87% (fallthrough)
+branch 12 taken 13%
+branch 13 taken 100% (fallthrough)
+branch 14 taken 0%
+branch 15 taken 19% (fallthrough)
+branch 16 taken 81%
+branch 17 never executed
+branch 18 never executed
+branch 19 never executed
+branch 20 never executed
+      323:  458:          __i = insert(__i, value_type(__k, mapped_type()));
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+call    4 returned 100%
+call    5 never executed
+     1739:  459:	return (*__i).second;
+call    0 returned 100%
+        -:  460:      }
+        -:  461:
+        -:  462:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  463:      mapped_type&
+        -:  464:      operator[](key_type&& __k)
+        -:  465:      {
+        -:  466:	// concept requirements
+        -:  467:	__glibcxx_function_requires(_DefaultConstructibleConcept<mapped_type>)
+        -:  468:
+        -:  469:	iterator __i = lower_bound(__k);
+        -:  470:	// __i->first is greater than or equivalent to __k.
+        -:  471:	if (__i == end() || key_comp()(__k, (*__i).first))
+        -:  472:          __i = insert(__i, std::make_pair(std::move(__k), mapped_type()));
+        -:  473:	return (*__i).second;
+        -:  474:      }
+        -:  475:#endif
+        -:  476:
+        -:  477:      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  478:      // DR 464. Suggestion for new member functions in standard containers.
+        -:  479:      /**
+        -:  480:       *  @brief  Access to %map data.
+        -:  481:       *  @param  __k  The key for which data should be retrieved.
+        -:  482:       *  @return  A reference to the data whose key is equivalent to @a __k, if
+        -:  483:       *           such a data is present in the %map.
+        -:  484:       *  @throw  std::out_of_range  If no such data is present.
+        -:  485:       */
+        -:  486:      mapped_type&
+        -:  487:      at(const key_type& __k)
+        -:  488:      {
+        -:  489:	iterator __i = lower_bound(__k);
+        -:  490:	if (__i == end() || key_comp()(__k, (*__i).first))
+        -:  491:	  __throw_out_of_range(__N("map::at"));
+        -:  492:	return (*__i).second;
+        -:  493:      }
+        -:  494:
+        -:  495:      const mapped_type&
+        -:  496:      at(const key_type& __k) const
+        -:  497:      {
+        -:  498:	const_iterator __i = lower_bound(__k);
+        -:  499:	if (__i == end() || key_comp()(__k, (*__i).first))
+        -:  500:	  __throw_out_of_range(__N("map::at"));
+        -:  501:	return (*__i).second;
+        -:  502:      }
+        -:  503:
+        -:  504:      // modifiers
+        -:  505:      /**
+        -:  506:       *  @brief Attempts to insert a std::pair into the %map.
+        -:  507:
+        -:  508:       *  @param __x Pair to be inserted (see std::make_pair for easy
+        -:  509:       *	     creation of pairs).
+        -:  510:       *
+        -:  511:       *  @return  A pair, of which the first element is an iterator that 
+        -:  512:       *           points to the possibly inserted pair, and the second is 
+        -:  513:       *           a bool that is true if the pair was actually inserted.
+        -:  514:       *
+        -:  515:       *  This function attempts to insert a (key, value) %pair into the %map.
+        -:  516:       *  A %map relies on unique keys and thus a %pair is only inserted if its
+        -:  517:       *  first element (the key) is not already present in the %map.
+        -:  518:       *
+        -:  519:       *  Insertion requires logarithmic time.
+        -:  520:       */
+        -:  521:      std::pair<iterator, bool>
+        -:  522:      insert(const value_type& __x)
+        -:  523:      { return _M_t._M_insert_unique(__x); }
+        -:  524:
+        -:  525:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  526:      template<typename _Pair, typename = typename
+        -:  527:	       std::enable_if<std::is_constructible<value_type,
+        -:  528:						    _Pair&&>::value>::type>
+        -:  529:        std::pair<iterator, bool>
+        -:  530:        insert(_Pair&& __x)
+        -:  531:        { return _M_t._M_insert_unique(std::forward<_Pair>(__x)); }
+        -:  532:#endif
+        -:  533:
+        -:  534:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  535:      /**
+        -:  536:       *  @brief Attempts to insert a list of std::pairs into the %map.
+        -:  537:       *  @param  __list  A std::initializer_list<value_type> of pairs to be
+        -:  538:       *                  inserted.
+        -:  539:       *
+        -:  540:       *  Complexity similar to that of the range constructor.
+        -:  541:       */
+        -:  542:      void
+        -:  543:      insert(std::initializer_list<value_type> __list)
+        -:  544:      { insert(__list.begin(), __list.end()); }
+        -:  545:#endif
+        -:  546:
+        -:  547:      /**
+        -:  548:       *  @brief Attempts to insert a std::pair into the %map.
+        -:  549:       *  @param  __position  An iterator that serves as a hint as to where the
+        -:  550:       *                    pair should be inserted.
+        -:  551:       *  @param  __x  Pair to be inserted (see std::make_pair for easy creation
+        -:  552:       *               of pairs).
+        -:  553:       *  @return An iterator that points to the element with key of
+        -:  554:       *           @a __x (may or may not be the %pair passed in).
+        -:  555:       *
+        -:  556:
+        -:  557:       *  This function is not concerned about whether the insertion
+        -:  558:       *  took place, and thus does not return a boolean like the
+        -:  559:       *  single-argument insert() does.  Note that the first
+        -:  560:       *  parameter is only a hint and can potentially improve the
+        -:  561:       *  performance of the insertion process.  A bad hint would
+        -:  562:       *  cause no gains in efficiency.
+        -:  563:       *
+        -:  564:       *  See
+        -:  565:       *  http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt07ch17.html
+        -:  566:       *  for more on @a hinting.
+        -:  567:       *
+        -:  568:       *  Insertion requires logarithmic time (if the hint is not taken).
+        -:  569:       */
+        -:  570:      iterator
+        -:  571:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  572:      insert(const_iterator __position, const value_type& __x)
+        -:  573:#else
+        -:  574:      insert(iterator __position, const value_type& __x)
+        -:  575:#endif
+        -:  576:      { return _M_t._M_insert_unique_(__position, __x); }
+        -:  577:
+        -:  578:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  579:      template<typename _Pair, typename = typename
+        -:  580:	       std::enable_if<std::is_constructible<value_type,
+        -:  581:						    _Pair&&>::value>::type>
+        -:  582:        iterator
+function _ZNSt3mapIiiSt4lessIiESaISt4pairIKiiEEE6insertIS4_vEESt17_Rb_tree_iteratorIS4_ESt23_Rb_tree_const_iteratorIS4_EOT_ called 323 returned 100% blocks executed 100%
+      323:  583:        insert(const_iterator __position, _Pair&& __x)
+        -:  584:        { return _M_t._M_insert_unique_(__position,
+      323:  585:					std::forward<_Pair>(__x)); }
+call    0 returned 100%
+call    1 returned 100%
+        -:  586:#endif
+        -:  587:
+        -:  588:      /**
+        -:  589:       *  @brief Template function that attempts to insert a range of elements.
+        -:  590:       *  @param  __first  Iterator pointing to the start of the range to be
+        -:  591:       *                   inserted.
+        -:  592:       *  @param  __last  Iterator pointing to the end of the range.
+        -:  593:       *
+        -:  594:       *  Complexity similar to that of the range constructor.
+        -:  595:       */
+        -:  596:      template<typename _InputIterator>
+        -:  597:        void
+        -:  598:        insert(_InputIterator __first, _InputIterator __last)
+        -:  599:        { _M_t._M_insert_unique(__first, __last); }
+        -:  600:
+        -:  601:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  602:      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  603:      // DR 130. Associative erase should return an iterator.
+        -:  604:      /**
+        -:  605:       *  @brief Erases an element from a %map.
+        -:  606:       *  @param  __position  An iterator pointing to the element to be erased.
+        -:  607:       *  @return An iterator pointing to the element immediately following
+        -:  608:       *          @a position prior to the element being erased. If no such 
+        -:  609:       *          element exists, end() is returned.
+        -:  610:       *
+        -:  611:       *  This function erases an element, pointed to by the given
+        -:  612:       *  iterator, from a %map.  Note that this function only erases
+        -:  613:       *  the element, and that if the element is itself a pointer,
+        -:  614:       *  the pointed-to memory is not touched in any way.  Managing
+        -:  615:       *  the pointer is the user's responsibility.
+        -:  616:       */
+        -:  617:      iterator
+        -:  618:      erase(const_iterator __position)
+        -:  619:      { return _M_t.erase(__position); }
+        -:  620:
+        -:  621:      // LWG 2059.
+        -:  622:      iterator
+        -:  623:      erase(iterator __position)
+        -:  624:      { return _M_t.erase(__position); }
+        -:  625:#else
+        -:  626:      /**
+        -:  627:       *  @brief Erases an element from a %map.
+        -:  628:       *  @param  __position  An iterator pointing to the element to be erased.
+        -:  629:       *
+        -:  630:       *  This function erases an element, pointed to by the given
+        -:  631:       *  iterator, from a %map.  Note that this function only erases
+        -:  632:       *  the element, and that if the element is itself a pointer,
+        -:  633:       *  the pointed-to memory is not touched in any way.  Managing
+        -:  634:       *  the pointer is the user's responsibility.
+        -:  635:       */
+        -:  636:      void
+        -:  637:      erase(iterator __position)
+        -:  638:      { _M_t.erase(__position); }
+        -:  639:#endif
+        -:  640:
+        -:  641:      /**
+        -:  642:       *  @brief Erases elements according to the provided key.
+        -:  643:       *  @param  __x  Key of element to be erased.
+        -:  644:       *  @return  The number of elements erased.
+        -:  645:       *
+        -:  646:       *  This function erases all the elements located by the given key from
+        -:  647:       *  a %map.
+        -:  648:       *  Note that this function only erases the element, and that if
+        -:  649:       *  the element is itself a pointer, the pointed-to memory is not touched
+        -:  650:       *  in any way.  Managing the pointer is the user's responsibility.
+        -:  651:       */
+        -:  652:      size_type
+        -:  653:      erase(const key_type& __x)
+        -:  654:      { return _M_t.erase(__x); }
+        -:  655:
+        -:  656:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  657:      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  658:      // DR 130. Associative erase should return an iterator.
+        -:  659:      /**
+        -:  660:       *  @brief Erases a [first,last) range of elements from a %map.
+        -:  661:       *  @param  __first  Iterator pointing to the start of the range to be
+        -:  662:       *                   erased.
+        -:  663:       *  @param __last Iterator pointing to the end of the range to
+        -:  664:       *                be erased.
+        -:  665:       *  @return The iterator @a __last.
+        -:  666:       *
+        -:  667:       *  This function erases a sequence of elements from a %map.
+        -:  668:       *  Note that this function only erases the element, and that if
+        -:  669:       *  the element is itself a pointer, the pointed-to memory is not touched
+        -:  670:       *  in any way.  Managing the pointer is the user's responsibility.
+        -:  671:       */
+        -:  672:      iterator
+        -:  673:      erase(const_iterator __first, const_iterator __last)
+        -:  674:      { return _M_t.erase(__first, __last); }
+        -:  675:#else
+        -:  676:      /**
+        -:  677:       *  @brief Erases a [__first,__last) range of elements from a %map.
+        -:  678:       *  @param  __first  Iterator pointing to the start of the range to be
+        -:  679:       *                   erased.
+        -:  680:       *  @param __last Iterator pointing to the end of the range to
+        -:  681:       *                be erased.
+        -:  682:       *
+        -:  683:       *  This function erases a sequence of elements from a %map.
+        -:  684:       *  Note that this function only erases the element, and that if
+        -:  685:       *  the element is itself a pointer, the pointed-to memory is not touched
+        -:  686:       *  in any way.  Managing the pointer is the user's responsibility.
+        -:  687:       */
+        -:  688:      void
+        -:  689:      erase(iterator __first, iterator __last)
+        -:  690:      { _M_t.erase(__first, __last); }
+        -:  691:#endif
+        -:  692:
+        -:  693:      /**
+        -:  694:       *  @brief  Swaps data with another %map.
+        -:  695:       *  @param  __x  A %map of the same element and allocator types.
+        -:  696:       *
+        -:  697:       *  This exchanges the elements between two maps in constant
+        -:  698:       *  time.  (It is only swapping a pointer, an integer, and an
+        -:  699:       *  instance of the @c Compare type (which itself is often
+        -:  700:       *  stateless and empty), so it should be quite fast.)  Note
+        -:  701:       *  that the global std::swap() function is specialized such
+        -:  702:       *  that std::swap(m1,m2) will feed to this function.
+        -:  703:       */
+        -:  704:      void
+        -:  705:      swap(map& __x)
+        -:  706:      { _M_t.swap(__x._M_t); }
+        -:  707:
+        -:  708:      /**
+        -:  709:       *  Erases all elements in a %map.  Note that this function only
+        -:  710:       *  erases the elements, and that if the elements themselves are
+        -:  711:       *  pointers, the pointed-to memory is not touched in any way.
+        -:  712:       *  Managing the pointer is the user's responsibility.
+        -:  713:       */
+        -:  714:      void
+        -:  715:      clear() _GLIBCXX_NOEXCEPT
+        -:  716:      { _M_t.clear(); }
+        -:  717:
+        -:  718:      // observers
+        -:  719:      /**
+        -:  720:       *  Returns the key comparison object out of which the %map was
+        -:  721:       *  constructed.
+        -:  722:       */
+        -:  723:      key_compare
+function _ZNKSt3mapIiiSt4lessIiESaISt4pairIKiiEEE8key_compEv called 1521 returned 100% blocks executed 100%
+     1521:  724:      key_comp() const
+     1521:  725:      { return _M_t.key_comp(); }
+call    0 returned 100%
+        -:  726:
+        -:  727:      /**
+        -:  728:       *  Returns a value comparison object, built from the key comparison
+        -:  729:       *  object out of which the %map was constructed.
+        -:  730:       */
+        -:  731:      value_compare
+        -:  732:      value_comp() const
+        -:  733:      { return value_compare(_M_t.key_comp()); }
+        -:  734:
+        -:  735:      // [23.3.1.3] map operations
+        -:  736:      /**
+        -:  737:       *  @brief Tries to locate an element in a %map.
+        -:  738:       *  @param  __x  Key of (key, value) %pair to be located.
+        -:  739:       *  @return  Iterator pointing to sought-after element, or end() if not
+        -:  740:       *           found.
+        -:  741:       *
+        -:  742:       *  This function takes a key and tries to locate the element with which
+        -:  743:       *  the key matches.  If successful the function returns an iterator
+        -:  744:       *  pointing to the sought after %pair.  If unsuccessful it returns the
+        -:  745:       *  past-the-end ( @c end() ) iterator.
+        -:  746:       */
+        -:  747:      iterator
+        -:  748:      find(const key_type& __x)
+        -:  749:      { return _M_t.find(__x); }
+        -:  750:
+        -:  751:      /**
+        -:  752:       *  @brief Tries to locate an element in a %map.
+        -:  753:       *  @param  __x  Key of (key, value) %pair to be located.
+        -:  754:       *  @return  Read-only (constant) iterator pointing to sought-after
+        -:  755:       *           element, or end() if not found.
+        -:  756:       *
+        -:  757:       *  This function takes a key and tries to locate the element with which
+        -:  758:       *  the key matches.  If successful the function returns a constant
+        -:  759:       *  iterator pointing to the sought after %pair. If unsuccessful it
+        -:  760:       *  returns the past-the-end ( @c end() ) iterator.
+        -:  761:       */
+        -:  762:      const_iterator
+        -:  763:      find(const key_type& __x) const
+        -:  764:      { return _M_t.find(__x); }
+        -:  765:
+        -:  766:      /**
+        -:  767:       *  @brief  Finds the number of elements with given key.
+        -:  768:       *  @param  __x  Key of (key, value) pairs to be located.
+        -:  769:       *  @return  Number of elements with specified key.
+        -:  770:       *
+        -:  771:       *  This function only makes sense for multimaps; for map the result will
+        -:  772:       *  either be 0 (not present) or 1 (present).
+        -:  773:       */
+        -:  774:      size_type
+function _ZNKSt3mapIiiSt4lessIiESaISt4pairIKiiEEE5countERS3_ called 2625 returned 100% blocks executed 89%
+     2625:  775:      count(const key_type& __x) const
+     2625:  776:      { return _M_t.find(__x) == _M_t.end() ? 0 : 1; }
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+call    4 returned 100%
+branch  5 taken 78% (fallthrough)
+branch  6 taken 22%
+call    7 never executed
+        -:  777:
+        -:  778:      /**
+        -:  779:       *  @brief Finds the beginning of a subsequence matching given key.
+        -:  780:       *  @param  __x  Key of (key, value) pair to be located.
+        -:  781:       *  @return  Iterator pointing to first element equal to or greater
+        -:  782:       *           than key, or end().
+        -:  783:       *
+        -:  784:       *  This function returns the first element of a subsequence of elements
+        -:  785:       *  that matches the given key.  If unsuccessful it returns an iterator
+        -:  786:       *  pointing to the first element that has a greater value than given key
+        -:  787:       *  or end() if no such element exists.
+        -:  788:       */
+        -:  789:      iterator
+function _ZNSt3mapIiiSt4lessIiESaISt4pairIKiiEEE11lower_boundERS3_ called 1739 returned 100% blocks executed 100%
+     1739:  790:      lower_bound(const key_type& __x)
+     1739:  791:      { return _M_t.lower_bound(__x); }
+call    0 returned 100%
+        -:  792:
+        -:  793:      /**
+        -:  794:       *  @brief Finds the beginning of a subsequence matching given key.
+        -:  795:       *  @param  __x  Key of (key, value) pair to be located.
+        -:  796:       *  @return  Read-only (constant) iterator pointing to first element
+        -:  797:       *           equal to or greater than key, or end().
+        -:  798:       *
+        -:  799:       *  This function returns the first element of a subsequence of elements
+        -:  800:       *  that matches the given key.  If unsuccessful it returns an iterator
+        -:  801:       *  pointing to the first element that has a greater value than given key
+        -:  802:       *  or end() if no such element exists.
+        -:  803:       */
+        -:  804:      const_iterator
+        -:  805:      lower_bound(const key_type& __x) const
+        -:  806:      { return _M_t.lower_bound(__x); }
+        -:  807:
+        -:  808:      /**
+        -:  809:       *  @brief Finds the end of a subsequence matching given key.
+        -:  810:       *  @param  __x  Key of (key, value) pair to be located.
+        -:  811:       *  @return Iterator pointing to the first element
+        -:  812:       *          greater than key, or end().
+        -:  813:       */
+        -:  814:      iterator
+        -:  815:      upper_bound(const key_type& __x)
+        -:  816:      { return _M_t.upper_bound(__x); }
+        -:  817:
+        -:  818:      /**
+        -:  819:       *  @brief Finds the end of a subsequence matching given key.
+        -:  820:       *  @param  __x  Key of (key, value) pair to be located.
+        -:  821:       *  @return  Read-only (constant) iterator pointing to first iterator
+        -:  822:       *           greater than key, or end().
+        -:  823:       */
+        -:  824:      const_iterator
+        -:  825:      upper_bound(const key_type& __x) const
+        -:  826:      { return _M_t.upper_bound(__x); }
+        -:  827:
+        -:  828:      /**
+        -:  829:       *  @brief Finds a subsequence matching given key.
+        -:  830:       *  @param  __x  Key of (key, value) pairs to be located.
+        -:  831:       *  @return  Pair of iterators that possibly points to the subsequence
+        -:  832:       *           matching given key.
+        -:  833:       *
+        -:  834:       *  This function is equivalent to
+        -:  835:       *  @code
+        -:  836:       *    std::make_pair(c.lower_bound(val),
+        -:  837:       *                   c.upper_bound(val))
+        -:  838:       *  @endcode
+        -:  839:       *  (but is faster than making the calls separately).
+        -:  840:       *
+        -:  841:       *  This function probably only makes sense for multimaps.
+        -:  842:       */
+        -:  843:      std::pair<iterator, iterator>
+        -:  844:      equal_range(const key_type& __x)
+        -:  845:      { return _M_t.equal_range(__x); }
+        -:  846:
+        -:  847:      /**
+        -:  848:       *  @brief Finds a subsequence matching given key.
+        -:  849:       *  @param  __x  Key of (key, value) pairs to be located.
+        -:  850:       *  @return  Pair of read-only (constant) iterators that possibly points
+        -:  851:       *           to the subsequence matching given key.
+        -:  852:       *
+        -:  853:       *  This function is equivalent to
+        -:  854:       *  @code
+        -:  855:       *    std::make_pair(c.lower_bound(val),
+        -:  856:       *                   c.upper_bound(val))
+        -:  857:       *  @endcode
+        -:  858:       *  (but is faster than making the calls separately).
+        -:  859:       *
+        -:  860:       *  This function probably only makes sense for multimaps.
+        -:  861:       */
+        -:  862:      std::pair<const_iterator, const_iterator>
+        -:  863:      equal_range(const key_type& __x) const
+        -:  864:      { return _M_t.equal_range(__x); }
+        -:  865:
+        -:  866:      template<typename _K1, typename _T1, typename _C1, typename _A1>
+        -:  867:        friend bool
+        -:  868:        operator==(const map<_K1, _T1, _C1, _A1>&,
+        -:  869:		   const map<_K1, _T1, _C1, _A1>&);
+        -:  870:
+        -:  871:      template<typename _K1, typename _T1, typename _C1, typename _A1>
+        -:  872:        friend bool
+        -:  873:        operator<(const map<_K1, _T1, _C1, _A1>&,
+        -:  874:		  const map<_K1, _T1, _C1, _A1>&);
+        -:  875:    };
+        -:  876:
+        -:  877:  /**
+        -:  878:   *  @brief  Map equality comparison.
+        -:  879:   *  @param  __x  A %map.
+        -:  880:   *  @param  __y  A %map of the same type as @a x.
+        -:  881:   *  @return  True iff the size and elements of the maps are equal.
+        -:  882:   *
+        -:  883:   *  This is an equivalence relation.  It is linear in the size of the
+        -:  884:   *  maps.  Maps are considered equivalent if their sizes are equal,
+        -:  885:   *  and if corresponding elements compare equal.
+        -:  886:  */
+        -:  887:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  888:    inline bool
+        -:  889:    operator==(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  890:               const map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  891:    { return __x._M_t == __y._M_t; }
+        -:  892:
+        -:  893:  /**
+        -:  894:   *  @brief  Map ordering relation.
+        -:  895:   *  @param  __x  A %map.
+        -:  896:   *  @param  __y  A %map of the same type as @a x.
+        -:  897:   *  @return  True iff @a x is lexicographically less than @a y.
+        -:  898:   *
+        -:  899:   *  This is a total ordering relation.  It is linear in the size of the
+        -:  900:   *  maps.  The elements must be comparable with @c <.
+        -:  901:   *
+        -:  902:   *  See std::lexicographical_compare() for how the determination is made.
+        -:  903:  */
+        -:  904:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  905:    inline bool
+        -:  906:    operator<(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  907:              const map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  908:    { return __x._M_t < __y._M_t; }
+        -:  909:
+        -:  910:  /// Based on operator==
+        -:  911:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  912:    inline bool
+        -:  913:    operator!=(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  914:               const map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  915:    { return !(__x == __y); }
+        -:  916:
+        -:  917:  /// Based on operator<
+        -:  918:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  919:    inline bool
+        -:  920:    operator>(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  921:              const map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  922:    { return __y < __x; }
+        -:  923:
+        -:  924:  /// Based on operator<
+        -:  925:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  926:    inline bool
+        -:  927:    operator<=(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  928:               const map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  929:    { return !(__y < __x); }
+        -:  930:
+        -:  931:  /// Based on operator<
+        -:  932:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  933:    inline bool
+        -:  934:    operator>=(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  935:               const map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  936:    { return !(__x < __y); }
+        -:  937:
+        -:  938:  /// See std::map::swap().
+        -:  939:  template<typename _Key, typename _Tp, typename _Compare, typename _Alloc>
+        -:  940:    inline void
+        -:  941:    swap(map<_Key, _Tp, _Compare, _Alloc>& __x,
+        -:  942:	 map<_Key, _Tp, _Compare, _Alloc>& __y)
+        -:  943:    { __x.swap(__y); }
+        -:  944:
+        -:  945:_GLIBCXX_END_NAMESPACE_CONTAINER
+        -:  946:} // namespace std
+        -:  947:
+        -:  948:#endif /* _STL_MAP_H */

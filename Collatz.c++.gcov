@@ -1,0 +1,191 @@
+        -:    0:Source:Collatz.c++
+        -:    0:Programs:2
+        -:    1:// ----------------------------
+        -:    2:// projects/collatz/Collatz.c++
+        -:    3:// Copyright (C) 2014
+        -:    4:// Glenn P. Downing
+        -:    5:// ----------------------------
+        -:    6:
+        -:    7:// --------
+        -:    8:// includes
+        -:    9:// --------
+        -:   10:
+        -:   11:#include <cassert>  // assert
+        -:   12:#include <iostream> // endl, istream, ostream
+        -:   13:#include <utility>  // make_pair, pair
+        -:   14:#include <map>
+        -:   15:#include "Collatz.h"
+        -:   16:
+        1:   17:std::map<int, int> cache;
+call    0 returned 100%
+call    1 returned 100%
+        -:   18://int cache[1000000] = {0};
+        -:   19:
+        -:   20:// ------------
+        -:   21:// collatz_read
+        -:   22:// ------------
+        -:   23:
+function _Z12collatz_readRSi called 18 returned 100% blocks executed 90%
+       18:   24:std::pair<int, int> collatz_read (std::istream& r) {
+        -:   25:    int i;
+       18:   26:    r >> i;
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+       18:   27:    if (!r)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+branch  3 taken 28% (fallthrough)
+branch  4 taken 72%
+        5:   28:        return std::make_pair(0, 0);
+call    0 returned 100%
+        -:   29:    int j;
+       13:   30:    r >> j;
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+       13:   31:    return std::make_pair(i, j);}
+call    0 returned 100%
+call    1 never executed
+        -:   32:
+        -:   33:// ------------
+        -:   34:// collatz_eval
+        -:   35:// ------------
+        -:   36:
+function _Z12collatz_evalii called 17 returned 100% blocks executed 94%
+       17:   37:int collatz_eval (int i, int j) {
+        -:   38:    // <your code>
+       17:   39:    if(i > j){
+branch  0 taken 6% (fallthrough)
+branch  1 taken 94%
+        1:   40:        int temp = i;
+        1:   41:        i = j;
+        1:   42:        j = temp;
+        -:   43:    }
+        -:   44:    
+       17:   45:    int max = 0;
+       17:   46:    if(i < j /2)
+branch  0 taken 35% (fallthrough)
+branch  1 taken 65%
+        6:   47:        i = j/2;
+        -:   48:
+      598:   49:    for(int k = i; k <= j; k++){       
+branch  0 taken 97%
+branch  1 taken 3% (fallthrough)
+      581:   50:        int length = 1;
+      581:   51:        int n = k;
+      581:   52:        if(cache.count(k) != 0)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+branch  3 taken 44% (fallthrough)
+branch  4 taken 56%
+      258:   53:            length = cache[k];
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+        -:   54:
+      581:   55:        if(cache[k] != 0)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+branch  3 taken 44% (fallthrough)
+branch  4 taken 56%
+      258:   56:            length = cache[k];
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+        -:   57:        else{
+     2690:   58:            while(n != 1){
+branch  0 taken 86%
+branch  1 taken 14% (fallthrough)
+     2044:   59:                if(n%2 == 0){
+branch  0 taken 51% (fallthrough)
+branch  1 taken 49%
+     1036:   60:                    n /= 2;
+     1036:   61:                    length++;
+        -:   62:                }
+        -:   63:                else{
+     1008:   64:                    n = (3*n + 1)/2;
+     1008:   65:                    length+=2;
+        -:   66:                }
+     2044:   67:                if(cache.count(n) != 0){
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+branch  3 taken 16% (fallthrough)
+branch  4 taken 84%
+      319:   68:                    length += cache[n] - 1;
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+      319:   69:                    n = 1;
+        -:   70:                }
+        -:   71:                // if(n < 1000000 && cache[n] != 0){
+        -:   72:                //     length += cache[n] - 1;
+        -:   73:                //     n = 1;
+        -:   74:                // }
+        -:   75:            }
+      323:   76:            cache[k] = length;
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+        -:   77:        }
+        -:   78:
+      581:   79:        if(length > max)
+branch  0 taken 10% (fallthrough)
+branch  1 taken 90%
+       60:   80:            max = length;
+        -:   81:    }
+       17:   82:    return max;
+call    0 never executed
+        -:   83:}
+        -:   84:
+        -:   85:// -------------
+        -:   86:// collatz_print
+        -:   87:// -------------
+        -:   88:
+function _Z13collatz_printRSoiii called 14 returned 100% blocks executed 100%
+       14:   89:void collatz_print (std::ostream& w, int i, int j, int v) {
+       14:   90:    w << i << " " << j << " " << v << std::endl;}
+call    0 returned 100%
+call    1 returned 100%
+call    2 returned 100%
+call    3 returned 100%
+call    4 returned 100%
+call    5 returned 100%
+        -:   91:
+        -:   92:// -------------
+        -:   93:// collatz_solve
+        -:   94:// -------------
+        -:   95:
+function _Z13collatz_solveRSiRSo called 4 returned 100% blocks executed 90%
+       14:   96:void collatz_solve (std::istream& r, std::ostream& w) {
+       10:   97:    while (true) {
+       14:   98:        const std::pair<int, int> p = collatz_read(r);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+       14:   99:        if (p == std::make_pair(0, 0))
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 71% (fallthrough)
+branch  3 taken 29%
+        4:  100:            return;
+call    0 never executed
+       10:  101:        const int v = collatz_eval(p.first, p.second);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0% (throw)
+call    2 returned 100%
+function _GLOBAL__sub_I_cache called 1 returned 100% blocks executed 100%
+function _Z41__static_initialization_and_destruction_0ii called 1 returned 100% blocks executed 100%
+       13:  102:        collatz_print(w, p.first, p.second, v);}}
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+branch  3 taken 100% (fallthrough)
+branch  4 taken 0%
+branch  5 taken 100% (fallthrough)
+branch  6 taken 0% (throw)
+call    7 returned 100%
