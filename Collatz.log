@@ -1,3 +1,15 @@
+commit 79961fd0fd9be0927ffd3c4bd4902d4f24064dac
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Mon Jun 16 12:28:17 2014 -0500
+
+    forgot to update Collatz.c++
+
+commit 660edaf1cdd2d4794c216b02835f7bf342afa310
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Mon Jun 16 12:18:30 2014 -0500
+
+    log
+
 commit c11106082b456dec70d2694d2b9110f108cf7b27
 Author: binwei lin <binwei92@cs.utexas.edu>
 Date:   Mon Jun 16 12:14:42 2014 -0500
