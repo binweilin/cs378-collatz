@@ -1,8 +1,53 @@
-1. Original code
-2. excute files
-3. simplest form
-4. frist optimization: two operations at a time
-5. second optimization: check if i < j/2
-6. add cache of two forms: array and map (I comment out map)
-7. fix an error: need to put samller number in front of larger one, also add some files create by running the program
-8. add git SHA
+commit c11106082b456dec70d2694d2b9110f108cf7b27
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Mon Jun 16 12:14:42 2014 -0500
+
+    log and doxygen
+
+commit ce1207e0da70fc63abc6efe19d02b3d431be9382
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Sat Jun 14 18:31:58 2014 -0500
+
+    gitSHA
+
+commit f42cd682d91330bc00345daf97192c9c4e1f7b0c
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Sat Jun 14 18:24:31 2014 -0500
+
+    put samller number at front
+
+commit cffafec4cc301b418c183528d8b2a49538423492
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Sat Jun 14 17:29:47 2014 -0500
+
+    cache: array and map
+
+commit 167c6ab8ac99fb3b997e9f57203dbd58cded589d
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Sat Jun 14 16:45:29 2014 -0500
+
+    second optimization
+
+commit 300c6af6b75c4b248b0008e5bd668de65f770547
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Sat Jun 14 16:44:28 2014 -0500
+
+    two operations once
+
+commit aeab71d65ac8c8d45250eb679455949e1d5a976a
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Wed Jun 11 14:42:29 2014 -0500
+
+    most stupid
+
+commit e0e9d0b6c49d704dfd7453814e6ccee815534005
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Wed Jun 11 14:39:59 2014 -0500
+
+    compile files
+
+commit 42ca219f56c454c3f9ec58c116def4fee6381ce2
+Author: binwei lin <binwei92@cs.utexas.edu>
+Date:   Wed Jun 11 12:44:11 2014 -0500
+
+    original code
