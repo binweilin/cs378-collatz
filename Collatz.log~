@@ -1,0 +1,8 @@
+1. Original code
+2. excute files
+3. simplest form
+4. frist optimization: two operations at a time
+5. second optimization: check if i < j/2
+6. add cache of two forms: array and map (I comment out map)
+7. fix an error: need to put samller number in front of larger one, also add some files create by running the program
+8. add git SHA
